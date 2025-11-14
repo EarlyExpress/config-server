@@ -1,3 +1,48 @@
 spring:
   application:
     name: config-server
+
+  profiles:
+    active: git
+
+  cloud:
+    config:
+      server:
+        git:
+          uri: ${CONFIG_GIT_URI:https://github.com/EarlyExpress/project-configs}
+          default-label: ${CONFIG_GIT_BRANCH:main}
+          search-paths:
+            - configs/common
+            - configs/{application}/{profile}
+            - configs/{application}
+          basedir: configs
+          clone-on-start: true
+
+eureka:
+  instance:
+    prefer-ip-address: false
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+  client:
+    register-with-eureka: ${EUREKA_REGISTER:true}
+    fetch-registry: ${EUREKA_FETCH:true}
+    service-url:
+      defaultZone: ${EUREKA_CLIENT_SERVICEURL_DEFAULTZONE:http://localhost:3150/eureka/}
+
+server:
+  port: ${SERVER_PORT:3100}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: refresh,health,info,prometheus,metrics
+  endpoint:
+    prometheus:
+      enabled: true
+    metrics:
+      enabled: true
+      export:
+        prometheus:
+          enabled: true
+      tags:
+        application: ${spring.application.name}
